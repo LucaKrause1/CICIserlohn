@@ -13,7 +13,7 @@ const char* mqtt_server = "192.168.4.1";  // IP of the MQTT broker
 const char* topic = "test";
 const char* mqtt_username = "cic"; // MQTT username
 const char* mqtt_password = "cic"; // MQTT password
-const char* clientID = "esp32test"; // MQTT client ID
+const char* clientID = "esp32test2"; // MQTT client ID
 
 int16_t count = 0;
 
@@ -22,6 +22,15 @@ WiFiClient wifiClient;
 // 1883 is the listener port for the Broker
 PubSubClient client(mqtt_server, 1883, wifiClient); 
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
 
 // Custom function to connet to the MQTT broker via WiFi
 void connect_MQTT(){
@@ -59,25 +68,33 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect(clientID, mqtt_username, mqtt_password)) {
+      Serial.println("connected");
+      // ... and resubscribe
+      client.subscribe(topic);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
 }
 
 void loop() {
-  connect_MQTT();
-  Serial.setTimeout(2000);
-
-  // PUBLISH to the MQTT Broker (topic = Temperature, defined at the beginning)
-  if (client.publish(topic, String(count).c_str())) {
-    Serial.println("sent!");
-    count++;
+  if (!client.connected()) {
+    reconnect();
   }
-  // Again, client.publish will return a boolean value depending on whether it succeded or not.
-  // If the message failed to send, we will try again, as the connection may have broken.
-  else {
-    Serial.println(" failed to send. Reconnecting to MQTT Broker and trying again");
-    client.connect(clientID, mqtt_username, mqtt_password);
-    delay(10); // This delay ensures that client.publish doesn't clash with the client.connect call
-    client.publish(topic, "Test");
-  }
-  client.disconnect();  // disconnect from the MQTT broker
-  delay(1000*10);       // print new values every 1 Minute
+  client.loop();
 }
