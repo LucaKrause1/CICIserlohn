@@ -74,7 +74,7 @@ std::string UIDs[DIFFERENT_TAGS][NUMBER_TAGS] = {
 
 void setup() {
   Serial.begin(9600);  // Initialize serial communications with the PC
-  while (!Serial);     // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+  //while (!Serial);     // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
   SPI.begin();         // Init SPI bus
   mfrc522.PCD_Init();  // Init MFRC522 card
   Serial.println(F("Warning: this example overwrites the UID of your UID changeable card, use with care!"));
