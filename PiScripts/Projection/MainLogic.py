@@ -1,9 +1,6 @@
 import paho.mqtt.client as mqtt
-import osmnx as ox
-import networkx as nx
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 from enum import Enum
 
 MQTT_ADDRESS = '192.168.4.1'
