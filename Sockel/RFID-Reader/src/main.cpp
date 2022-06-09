@@ -137,59 +137,60 @@ void connect_MQTT(){
 
 
 void loop() {
-  // Look for new cards, and select one if present
-  if ( ! mfrc522.PICC_IsNewCardPresent() || ! mfrc522.PICC_ReadCardSerial() ) {
-    delay(50);
-    return;
-  }
-  // Now a card is selected. The UID and SAK is in mfrc522.uid.
-  
-  char b[mfrc522.uid.size] = {};
-  byte size = mfrc522.uid.size * 2 + mfrc522.uid.size - 1;
-  for (byte i = 0; i < mfrc522.uid.size; i++) {    
-    b[i] = mfrc522.uid.uidByte[i];
-    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-    Serial.print(mfrc522.uid.uidByte[i], HEX);
-  }
-  Serial.println();
-
-  //je zwei zeichen + leerzeichen (ohne letzte Zahl) + Ende: null
-  char dest[3*sizeof b];
-
-  hexString(b, sizeof b, dest);
-  dest[3*sizeof b - 1] = '\0';
-  //Serial.println(dest);
-
-  //default = 0 -> keine gültige Vitrine
-  byte showcase = 0;
-  std::string s(dest);
-
-  for(int i = 0; i < DIFFERENT_TAGS; i++) {
-    for(int j = 0; j < sizeof NUMBER_TAGS; j++) {
-      if (s == UIDs[i][j]) {
-        showcase = i + 1;
+  std::string res = "none";
+  uint8_t cnt = 0;
+  while(cnt < 10 && res == "none") {
+    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+      char b[mfrc522.uid.size] = {};
+      byte size = mfrc522.uid.size * 2 + mfrc522.uid.size - 1;
+      for (byte i = 0; i < mfrc522.uid.size; i++) {
+        b[i] = mfrc522.uid.uidByte[i];
+        Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+        Serial.print(mfrc522.uid.uidByte[i], HEX);
       }
+      Serial.println();
+
+      // je zwei zeichen + leerzeichen (ohne letzte Zahl) + Ende: null
+      char dest[3 * sizeof b];
+
+      hexString(b, sizeof b, dest);
+      dest[3 * sizeof b - 1] = '\0';
+      // Serial.println(dest);
+
+      // default = 0 -> keine gültige Vitrine
+      byte showcase = 0;
+      std::string s(dest);
+
+      for (int i = 0; i < DIFFERENT_TAGS; i++) {
+        for (int j = 0; j < sizeof NUMBER_TAGS; j++) {
+          if (s == UIDs[i][j]) {
+            showcase = i + 1;
+          }
+        }
+      }
+      switch (showcase) {
+        case 1:
+          res = "abus";
+          break;
+        case 2:
+          res = "tree";
+          break;
+        default:
+          break;
+      }
+
+      Serial.println(showcase);
+    }else{
+      cnt++;
+      delay(10);
     }
   }
   
-  Serial.println(showcase);
 
   //Ojekt an Broker übertragen
-  std::string res = "none";
-
-  switch (showcase){
-  case 1:
-    res = "abus";
-    break;
-  case 2:
-    res = "tree";
-    break;
-  default:
-    break;
-  }
 
   connect_MQTT();
-  Serial.setTimeout(2000);
+  //Serial.setTimeout(2000);
 
   // PUBLISH to the MQTT Broker (topic = Temperature, defined at the beginning)
   if (client.publish(topic, res.c_str())) {
@@ -206,5 +207,5 @@ void loop() {
   }
   client.disconnect();  // disconnect from the MQTT broker
   
-  delay(1000);
+  delay(100);
 }

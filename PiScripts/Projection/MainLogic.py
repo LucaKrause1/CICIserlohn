@@ -22,11 +22,11 @@ modeToImage = {
 }
 
 modeToInfo = {
-    Mode.NO_MODEL : "img/info.png",
-    Mode.ABUS : "img/infoAbus.png",
-    Mode.TREE : "img/infoTree.png",
+    Mode.NO_MODEL : "img/info.jpg",
+    Mode.ABUS : "img/infoAbus.jpg",
+    Mode.TREE : "img/infoTree.jpg",
 }
-    
+global currentMode
 oldMode = Mode.NO_MODEL    
 currentMode = Mode.NO_MODEL
 
@@ -39,11 +39,12 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     """The callback for when a PUBLISH message is received from the server."""
     print(msg.topic + ' ' + str(msg.payload))
-    if msg.payload == "b'abus'":
+    global currentMode
+    if str(msg.payload) == "b'abus'":
         currentMode = Mode.ABUS
-    elif msg.payload == "b'abus'":
+    elif str(msg.payload) == "b'tree'":
         currentMode = Mode.TREE    
-    elif msg.payload == "b'none'":
+    elif str(msg.payload) == "b'none'":
         currentMode = Mode.NO_MODEL  
     print(currentMode)
 
@@ -62,21 +63,24 @@ def main():
     cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
     while 1:
+        #mqtt_client.loop()
         pro = np.zeros((800,800,3), np.uint8)
 
         #Read the right image
         map = cv2.imread(modeToImage[currentMode])
         map = cv2.resize(map, (800, 800), interpolation= cv2.INTER_LINEAR)
 
-        info = cv2.imread(modeToImage[currentMode])
-        map = cv2.resize(map, (800, 480), interpolation= cv2.INTER_LINEAR)
+        info = cv2.imread(modeToInfo[currentMode])
+        info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
         oldMode = currentMode
-
+        
         while oldMode == currentMode:
+            #mqtt_client.loop()
+            print(oldMode)
             pro = map.copy()
             img = np.concatenate((pro, info), axis=1)
             cv2.imshow("window", img)
-            cv2.waitKey(50)
+            cv2.waitKey(10)
 
    
 
