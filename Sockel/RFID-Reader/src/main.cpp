@@ -29,8 +29,6 @@ const char* mqtt_username = "cic"; // MQTT username
 const char* mqtt_password = "cic"; // MQTT password
 const char* clientID = "esp32test"; // MQTT client ID
 
-int16_t count = 0;
-
 // Initialise the WiFi and MQTT Client objects
 WiFiClient wifiClient;
 // 1883 is the listener port for the Broker
@@ -139,7 +137,7 @@ void connect_MQTT(){
 void loop() {
   std::string res = "none";
   uint8_t cnt = 0;
-  while(cnt < 10 && res == "none") {
+  while(cnt < 20 && res == "none") {
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
       char b[mfrc522.uid.size] = {};
       byte size = mfrc522.uid.size * 2 + mfrc522.uid.size - 1;
@@ -162,7 +160,7 @@ void loop() {
       std::string s(dest);
 
       for (int i = 0; i < DIFFERENT_TAGS; i++) {
-        for (int j = 0; j < sizeof NUMBER_TAGS; j++) {
+        for (int j = 0; j < NUMBER_TAGS; j++) {
           if (s == UIDs[i][j]) {
             showcase = i + 1;
           }
@@ -182,7 +180,7 @@ void loop() {
       Serial.println(showcase);
     }else{
       cnt++;
-      delay(10);
+      delay(20);
     }
   }
   
@@ -195,7 +193,6 @@ void loop() {
   // PUBLISH to the MQTT Broker (topic = Temperature, defined at the beginning)
   if (client.publish(topic, res.c_str())) {
     Serial.println("sent!");
-    count++;
   }
   // Again, client.publish will return a boolean value depending on whether it succeded or not.
   // If the message failed to send, we will try again, as the connection may have broken.
