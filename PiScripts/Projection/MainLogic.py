@@ -1,4 +1,3 @@
-from sympy import Mod
 import paho.mqtt.client as mqtt
 import osmnx as ox
 import networkx as nx
