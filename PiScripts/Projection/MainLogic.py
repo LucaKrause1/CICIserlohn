@@ -17,7 +17,7 @@ class Mode(Enum):
 
 modeToImage = {
     Mode.NO_MODEL : "img/colorAllStreets.png",
-    Mode.ABUS : "img/colorBus.png",
+    Mode.ABUS : "img/greyBus.png",
     Mode.TREE : "img/buildings.png",
 }
 
@@ -61,8 +61,18 @@ def main():
 
     cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+    
+    f = open("generateImg/coords2.txt", "r")
+    l = f.read().split("\n")[:-1]
+
+    liste = []
+    for i in l:
+      x,y = i.split(";")
+      liste.append([x,y])
+    idx = 0
 
     while 1:
+        oldMode = currentMode
         #mqtt_client.loop()
         pro = np.zeros((800,800,3), np.uint8)
 
@@ -72,12 +82,18 @@ def main():
 
         info = cv2.imread(modeToInfo[currentMode])
         info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
-        oldMode = currentMode
+        
         
         while oldMode == currentMode:
-            #mqtt_client.loop()
-            print(oldMode)
             pro = map.copy()
+            if currentMode == Mode.ABUS:
+                x,y = liste[idx]
+                idx = (idx + 1)%len(liste)
+                x = float(x)
+                y = float(y)
+                coords = realCoordsToPixelCoords((x,y),realCoordWindow,pixelCoordWindow)
+                pro = cv2.circle(pro, coords, radius=6, color=(0, 0, 255), thickness=-1)
+            print(oldMode)
             img = np.concatenate((pro, info), axis=1)
             cv2.imshow("window", img)
             cv2.waitKey(10)
