@@ -1,5 +1,6 @@
-//www.elegoo.com
-//2016.12.09
+// ESP32, der im Sockel verbaut ist 
+// und einen RFID-Reader angeschlossen hat
+// @Authors: Paul Obernesser, Luca Krause
 #include <Arduino.h>
 #include <SPI.h>
 #include <string>
@@ -34,25 +35,9 @@ WiFiClient wifiClient;
 // 1883 is the listener port for the Broker
 PubSubClient client(mqtt_server, 1883, wifiClient); 
 
-
-/*
- * Vorherige Schlüssel aller 12:
- * 1. 04 4C 77 15 39 6C 80
- * 2. 04 23 B7 14 39 6C 80
- * 3. 04 BC EC 14 39 6C 80
- * 4. 04 B3 33 15 39 6C 80
- * 5. 04 95 FA 14 39 6C 80
- * 6. 04 7B C5 14 39 6C 80
- * 7. 04 09 8D 15 39 6C 80
- * 8. 04 59 E7 14 39 6C 80
- * 9. 04 52 A4 15 39 6C 80
- * 10. 04 DE F5 05 49 6C 80
- * 11. 04 36 E7 14 39 6C 80
- * 12. 04 F3 74 15 39 6C 80
- */
-
 MFRC522::MIFARE_Key key;
 
+//Alle UID's der NFC-Tags
 std::string UIDs[DIFFERENT_TAGS][NUMBER_TAGS] = {
   {//A-Bus
  "04 09 8D 15 39 6C 80",
