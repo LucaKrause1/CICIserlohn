@@ -22,9 +22,9 @@ modeToImage = {
 }
 
 modeToInfo = {
-    Mode.NO_MODEL : "img/info.jpg",
-    Mode.ABUS : "img/infoAbus.jpg",
-    Mode.TREE : "img/infoTree.jpg",
+    Mode.NO_MODEL : "img/info",
+    Mode.ABUS : "img/infoAbus",
+    Mode.TREE : "img/infoTree",
 }
 global currentMode
 oldMode = Mode.NO_MODEL    
@@ -62,25 +62,36 @@ def main():
     cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
+    infoNum = 0
+    infoCount = 0
+
     while 1:
         #mqtt_client.loop()
         pro = np.zeros((800,800,3), np.uint8)
 
         #Read the right image
-        map = cv2.imread(modeToImage[currentMode])
+        map = cv2.imread(modeToImage[currentMode] )
         map = cv2.resize(map, (800, 800), interpolation= cv2.INTER_LINEAR)
 
-        info = cv2.imread(modeToInfo[currentMode])
+        info = cv2.imread(modeToInfo[currentMode] + infoNum + ".jpg")
         info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
         oldMode = currentMode
         
         while oldMode == currentMode:
+            infoCount+=1
+            #Change Info after x cycles
+            if infoCount > 100:
+                infoCount = 0
+                infoNum = (infoNum+1)%4
+                info = cv2.imread(modeToInfo[currentMode] + infoNum + ".jpg")
+                info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
             #mqtt_client.loop()
             print(oldMode)
             pro = map.copy()
             img = np.concatenate((pro, info), axis=1)
             cv2.imshow("window", img)
             cv2.waitKey(10)
+
 
    
 
