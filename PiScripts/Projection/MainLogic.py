@@ -23,7 +23,7 @@ modeToImage = {
 
 modeToInfo = {
     Mode.NO_MODEL : "img/info",
-    Mode.ABUS : "img/infoAbus",
+    Mode.ABUS : "img/infoabus",
     Mode.TREE : "img/infoTree",
 }
 global currentMode
@@ -83,21 +83,21 @@ def main():
         map = cv2.imread(modeToImage[currentMode] )
         map = cv2.resize(map, (800, 800), interpolation= cv2.INTER_LINEAR)
 
-        info = cv2.imread(modeToInfo[currentMode] + infoNum + ".jpg")
+        info = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
         info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
         
         
         while oldMode == currentMode:
-            infoCount+=1
-            #Change Info after x cycles
-            if infoCount > 100:
-                infoCount = 0
-                infoNum = (infoNum+1)%4
-                info = cv2.imread(modeToInfo[currentMode] + infoNum + ".jpg")
-                info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
             #mqtt_client.loop()
             pro = map.copy()
             if currentMode == Mode.ABUS:
+                infoCount+=1
+                #Change Info after x cycles
+                if infoCount > 100:
+                    infoCount = 0
+                    infoNum = (infoNum+1)%4
+                    info = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
+                    info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
                 x,y = liste[idx]
                 idx = (idx + 1)%len(liste)
                 x = float(x)
