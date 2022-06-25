@@ -1,5 +1,6 @@
-//www.elegoo.com
-//2016.12.09
+// ESP32, der im Sockel verbaut ist 
+// und einen RFID-Reader angeschlossen hat
+// @Authors: Paul Obernesser, Luca Krause
 #include <Arduino.h>
 #include <SPI.h>
 #include <string>
@@ -29,32 +30,14 @@ const char* mqtt_username = "cic"; // MQTT username
 const char* mqtt_password = "cic"; // MQTT password
 const char* clientID = "esp32test"; // MQTT client ID
 
-int16_t count = 0;
-
 // Initialise the WiFi and MQTT Client objects
 WiFiClient wifiClient;
 // 1883 is the listener port for the Broker
 PubSubClient client(mqtt_server, 1883, wifiClient); 
 
-
-/*
- * Vorherige Schlüssel aller 12:
- * 1. 04 4C 77 15 39 6C 80
- * 2. 04 23 B7 14 39 6C 80
- * 3. 04 BC EC 14 39 6C 80
- * 4. 04 B3 33 15 39 6C 80
- * 5. 04 95 FA 14 39 6C 80
- * 6. 04 7B C5 14 39 6C 80
- * 7. 04 09 8D 15 39 6C 80
- * 8. 04 59 E7 14 39 6C 80
- * 9. 04 52 A4 15 39 6C 80
- * 10. 04 DE F5 05 49 6C 80
- * 11. 04 36 E7 14 39 6C 80
- * 12. 04 F3 74 15 39 6C 80
- */
-
 MFRC522::MIFARE_Key key;
 
+//Alle UID's der NFC-Tags
 std::string UIDs[DIFFERENT_TAGS][NUMBER_TAGS] = {
   {//A-Bus
  "04 09 8D 15 39 6C 80",
@@ -139,7 +122,7 @@ void connect_MQTT(){
 void loop() {
   std::string res = "none";
   uint8_t cnt = 0;
-  while(cnt < 10 && res == "none") {
+  while(cnt < 20 && res == "none") {
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
       char b[mfrc522.uid.size] = {};
       byte size = mfrc522.uid.size * 2 + mfrc522.uid.size - 1;
@@ -162,7 +145,7 @@ void loop() {
       std::string s(dest);
 
       for (int i = 0; i < DIFFERENT_TAGS; i++) {
-        for (int j = 0; j < sizeof NUMBER_TAGS; j++) {
+        for (int j = 0; j < NUMBER_TAGS; j++) {
           if (s == UIDs[i][j]) {
             showcase = i + 1;
           }
@@ -182,7 +165,7 @@ void loop() {
       Serial.println(showcase);
     }else{
       cnt++;
-      delay(10);
+      delay(20);
     }
   }
   
@@ -195,7 +178,6 @@ void loop() {
   // PUBLISH to the MQTT Broker (topic = Temperature, defined at the beginning)
   if (client.publish(topic, res.c_str())) {
     Serial.println("sent!");
-    count++;
   }
   // Again, client.publish will return a boolean value depending on whether it succeded or not.
   // If the message failed to send, we will try again, as the connection may have broken.
