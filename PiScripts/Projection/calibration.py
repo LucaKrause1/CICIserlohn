@@ -24,7 +24,7 @@ cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
 
 map = cv2.imread("img/buildings.png")
 map = cv2.resize(map, (800, 800), interpolation= cv2.INTER_LINEAR)
-info = cv2.imread("img/info.jpg")
+info = cv2.imread("img/info0.jpg")
 img = np.concatenate((map, info), axis=1)
 
 cv2.setMouseCallback('window', onMouse)

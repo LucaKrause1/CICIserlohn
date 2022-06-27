@@ -30,6 +30,13 @@ global currentMode
 oldMode = Mode.NO_MODEL    
 currentMode = Mode.NO_MODEL
 
+origPoints = [[743, 139], [84, 177], [67, 710], [722, 757]]
+calibPoints = [[743, 139], [84, 177], [67, 710], [722, 757]]
+oP = np.float32(origPoints)
+pL = np.float32(calibPoints)
+M = cv2.getPerspectiveTransform(oP,pL)
+
+
 def on_connect(client, userdata, flags, rc):
     """ The callback for when the client receives a CONNACK response from the server."""
     print('Connected with result code ' + str(rc))
@@ -82,6 +89,7 @@ def main():
         #Read the right image
         map = cv2.imread(modeToImage[currentMode] )
         map = cv2.resize(map, (800, 800), interpolation= cv2.INTER_LINEAR)
+        map = cv2.warpPerspective(map,M,(800, 800),flags=cv2.INTER_LINEAR)
 
         info = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
         info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
