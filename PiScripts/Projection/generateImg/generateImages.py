@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 CONFIG_FILE = 'configgrey.json'
-CONFIF_BOTH = False
+CONFIF_BOTH = True
 
 bbox=(51.38097,51.36682,7.70601,7.68292)
 gdf = ox.geometries_from_xml(filepath="./finalMap.osm")
@@ -68,7 +68,7 @@ def calc_new_width2(row):
    return 5 #configDf["street_width"][row["highway"]]*2
    
 def calc_new_color2(row):
-    return "#65046e"   
+    return "#FFFFFF"   
 
 def calc_new_color(row):
     return configDf["street_colors"][row["highway"]]
@@ -85,11 +85,19 @@ newgdfbus["street_color"] = newgdfbus.apply(calc_new_color2, axis=1)
 
 newgdf = newgdf.sort_values("street_width", ascending=True)
 
-buildinggdf =gdf[gdf["geometry"].type.isin({"Polygon", "MultiPolygon"})]
-buildinggdf =gdf[gdf["building"] == "yes"]
+t = set()
+for i in gdf["landuse"]:
+    t.add(i)
+for i in t:
+    print(i)
+
+#buildinggdf =gdf[gdf["geometry"].type.isin({"Polygon", "MultiPolygon"})]
+# buildinggdf =gdf[gdf["building"] == "yes"]
+# buildinggdf =gdf[gdf["landuse"] == "forest"]
+buildinggdf =gdf[gdf["landuse"].isin(["forest", "grass", "village_green", "farmland", "greenfield", "meadow"])]
 
 ax = newgdf.plot(color=newgdf["street_color"], linewidth= newgdf["street_width"])
-newgdfbus.plot(ax=ax, color=newgdfbus["street_color"], linewidth= newgdfbus["street_width"])
+# newgdfbus.plot(ax=ax, color=newgdfbus["street_color"], linewidth= newgdfbus["street_width"])
 fig = ax.get_figure()
 fig.set_size_inches(20,20)
 ax.set_xlim([7.68292, 7.70601])
@@ -99,9 +107,9 @@ plt.savefig('image.png', facecolor="black", dpi=100, bbox_inches='tight',pad_inc
 
 
 if(CONFIF_BOTH):
-    buildinggdf.plot(ax=ax, color="orange")
+    buildinggdf.plot(ax=ax, color="green")
 else:
-    ax = buildinggdf.plot(color="orange")
+    ax = buildinggdf.plot(color="green")
 fig = ax.get_figure()
 fig.set_size_inches(20,20)
 ax.set_xlim([7.68292, 7.70601])
