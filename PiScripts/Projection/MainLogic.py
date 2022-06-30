@@ -31,7 +31,7 @@ oldMode = Mode.NO_MODEL
 currentMode = Mode.NO_MODEL
 
 origPoints = [[743, 139], [84, 177], [67, 710], [722, 757]]
-calibPoints = [[743, 139], [84, 177], [67, 710], [722, 757]]
+calibPoints = [[754, 169], [117, 220], [99, 721], [746, 751]]
 oP = np.float32(origPoints)
 pL = np.float32(calibPoints)
 M = cv2.getPerspectiveTransform(oP,pL)
@@ -90,10 +90,13 @@ def main():
         map = cv2.imread(modeToImage[currentMode] )
         map = cv2.resize(map, (800, 800), interpolation= cv2.INTER_LINEAR)
         map = cv2.warpPerspective(map,M,(800, 800),flags=cv2.INTER_LINEAR)
-
-        info = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
-        info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
         
+        gap = np.zeros((800,100,3), np.uint8)
+        
+        infoNew = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
+        infoNew = cv2.resize(infoNew, (430, 750), interpolation= cv2.INTER_LINEAR)
+        info = cv2.copyMakeBorder(infoNew, 25, 25, 50, 0, cv2.BORDER_CONSTANT)
+                
         
         while oldMode == currentMode:
             #mqtt_client.loop()
@@ -104,8 +107,9 @@ def main():
                 if infoCount > 100:
                     infoCount = 0
                     infoNum = (infoNum+1)%4
-                    info = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
-                    info = cv2.resize(info, (480, 800), interpolation= cv2.INTER_LINEAR)
+                    infoNew = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
+                    infoNew = cv2.resize(infoNew, (380, 750), interpolation= cv2.INTER_LINEAR)
+                    info = cv2.copyMakeBorder(infoNew, 25, 25, 100, 0, cv2.BORDER_CONSTANT)
                 x,y = liste[idx]
                 idx = (idx + 1)%len(liste)
                 x = float(x)
