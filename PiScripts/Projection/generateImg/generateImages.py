@@ -8,7 +8,7 @@ import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
 
-CONFIG_FILE = 'configgrey.json'
+CONFIG_FILE = 'config3color.json'
 CONFIF_BOTH = True
 
 bbox=(51.38097,51.36682,7.70601,7.68292)
@@ -92,9 +92,9 @@ for i in t:
     print(i)
 
 #buildinggdf =gdf[gdf["geometry"].type.isin({"Polygon", "MultiPolygon"})]
-# buildinggdf =gdf[gdf["building"] == "yes"]
+buildinggdf =gdf[gdf["building"] == "yes"]
 # buildinggdf =gdf[gdf["landuse"] == "forest"]
-buildinggdf =gdf[gdf["landuse"].isin(["forest", "grass", "village_green", "farmland", "greenfield", "meadow"])]
+# buildinggdf =gdf[gdf["landuse"].isin(["forest", "grass", "village_green", "farmland", "greenfield", "meadow"])]
 
 ax = newgdf.plot(color=newgdf["street_color"], linewidth= newgdf["street_width"])
 # newgdfbus.plot(ax=ax, color=newgdfbus["street_color"], linewidth= newgdfbus["street_width"])
@@ -107,9 +107,9 @@ plt.savefig('image.png', facecolor="black", dpi=100, bbox_inches='tight',pad_inc
 
 
 if(CONFIF_BOTH):
-    buildinggdf.plot(ax=ax, color="green")
+    buildinggdf.plot(ax=ax, color="orange")
 else:
-    ax = buildinggdf.plot(color="green")
+    ax = buildinggdf.plot(color="orange")
 fig = ax.get_figure()
 fig.set_size_inches(20,20)
 ax.set_xlim([7.68292, 7.70601])

@@ -1,0 +1,30 @@
+{
+    "secondary": {
+        "street_width": 5,
+        "street_colors": "blue"
+    },
+    "residential": {
+        "street_width": 2,
+        "street_colors": "red"
+    },
+    "living_street": {
+        "street_width": 1,
+        "street_colors": "red"
+    },
+    "service": {
+        "street_width": 1,
+        "street_colors": "red"
+    },
+    "tertiary": {
+        "street_width": 3,
+        "street_colors": "green"
+    },
+    "secondary_link": {
+        "street_width": 1,
+        "street_colors": "red"
+    },
+    "unclassified": {
+        "street_width": 3,
+        "street_colors": "green"
+    }
+}
