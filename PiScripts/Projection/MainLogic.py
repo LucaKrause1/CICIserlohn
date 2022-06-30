@@ -8,6 +8,11 @@ MQTT_USER = 'cic'
 MQTT_PASSWORD = 'cic'
 MQTT_TOPIC = 'test'
 
+BORDER_TOP = 25
+BORDER_DOWN = 25
+BORDER_LEFT = 50
+BORDER_RIGHT = 0
+
 
 #Which operation modes the projection
 class Mode(Enum):
@@ -92,10 +97,7 @@ def main():
         
         gap = np.zeros((800,100,3), np.uint8)
         
-        BORDER_TOP = 25
-        BORDER_DOWN = 25
-        BORDER_LEFT = 50
-        BORDER_RIGHT = 0
+        
         
         
         infoNew = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
