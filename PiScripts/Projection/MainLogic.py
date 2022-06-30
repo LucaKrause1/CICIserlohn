@@ -37,10 +37,21 @@ currentMode = Mode.NO_MODEL
 
 origPoints = [[743, 139], [84, 177], [67, 710], [722, 757]]
 calibPoints = [[754, 169], [117, 220], [99, 721], [746, 751]]
+
+origPointsInfo = [[1279, 0], [800, 0], [800, 799], [1279, 799]]
+calibPointsInfo = [[1222, 96], [827, 23], [884, 724], [1262, 786]]
+
+for i in origPointsInfo:
+    i[0] = i[0]-800
+for i in calibPointsInfo:
+    i[0] = i[0]-800
 oP = np.float32(origPoints)
 pL = np.float32(calibPoints)
 M = cv2.getPerspectiveTransform(oP,pL)
 
+oPinfo = np.float32(origPointsInfo)
+pLinfo = np.float32(calibPointsInfo)
+Minfo = cv2.getPerspectiveTransform(oPinfo,pLinfo)
 
 def on_connect(client, userdata, flags, rc):
     """ The callback for when the client receives a CONNACK response from the server."""
@@ -101,8 +112,8 @@ def main():
         
         
         infoNew = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
-        infoNew = cv2.resize(infoNew, (480-BORDER_LEFT-BORDER_RIGHT, 800-BORDER_TOP-BORDER_DOWN), interpolation= cv2.INTER_LINEAR)
-        info = cv2.copyMakeBorder(infoNew, BORDER_TOP, BORDER_DOWN, BORDER_LEFT, BORDER_RIGHT, cv2.BORDER_CONSTANT)
+        info = cv2.resize(infoNew, (480, 800), interpolation= cv2.INTER_LINEAR)
+
                 
         
         while oldMode == currentMode:
@@ -115,8 +126,7 @@ def main():
                     infoCount = 0
                     infoNum = (infoNum+1)%4
                     infoNew = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
-                    infoNew = cv2.resize(infoNew, (480-BORDER_LEFT-BORDER_RIGHT, 800-BORDER_TOP-BORDER_DOWN), interpolation= cv2.INTER_LINEAR)
-                    info = cv2.copyMakeBorder(infoNew, BORDER_TOP, BORDER_DOWN, BORDER_LEFT, BORDER_RIGHT, cv2.BORDER_CONSTANT)
+                    info = cv2.resize(infoNew, (480, 800), interpolation= cv2.INTER_LINEAR)
                 x,y = liste[idx]
                 idx = (idx + 1)%len(liste)
                 x = float(x)
@@ -125,7 +135,8 @@ def main():
                 pro = cv2.circle(pro, coords, radius=6, color=(0, 0, 255), thickness=-1)
                 pro = cv2.warpPerspective(pro,M,(800, 800),flags=cv2.INTER_LINEAR)
             print(oldMode)
-            img = np.concatenate((pro, info), axis=1)
+            infoDis = cv2.warpPerspective(info,Minfo,(480, 800),flags=cv2.INTER_LINEAR)
+            img = np.concatenate((pro, infoDis), axis=1)
             cv2.imshow("window", img)
             cv2.waitKey(10)
 
