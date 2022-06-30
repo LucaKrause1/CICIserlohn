@@ -89,13 +89,18 @@ def main():
         #Read the right image
         map = cv2.imread(modeToImage[currentMode] )
         map = cv2.resize(map, (800, 800), interpolation= cv2.INTER_LINEAR)
-        map = cv2.warpPerspective(map,M,(800, 800),flags=cv2.INTER_LINEAR)
         
         gap = np.zeros((800,100,3), np.uint8)
         
+        BORDER_TOP = 25
+        BORDER_DOWN = 25
+        BORDER_LEFT = 50
+        BORDER_RIGHT = 0
+        
+        
         infoNew = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
-        infoNew = cv2.resize(infoNew, (430, 750), interpolation= cv2.INTER_LINEAR)
-        info = cv2.copyMakeBorder(infoNew, 25, 25, 50, 0, cv2.BORDER_CONSTANT)
+        infoNew = cv2.resize(infoNew, (480-BORDER_LEFT-BORDER_RIGHT, 800-BORDER_TOP-BORDER_DOWN), interpolation= cv2.INTER_LINEAR)
+        info = cv2.copyMakeBorder(infoNew, BORDER_TOP, BORDER_DOWN, BORDER_LEFT, BORDER_RIGHT, cv2.BORDER_CONSTANT)
                 
         
         while oldMode == currentMode:
@@ -108,14 +113,15 @@ def main():
                     infoCount = 0
                     infoNum = (infoNum+1)%4
                     infoNew = cv2.imread(modeToInfo[currentMode] + str(infoNum) + ".jpg")
-                    infoNew = cv2.resize(infoNew, (380, 750), interpolation= cv2.INTER_LINEAR)
-                    info = cv2.copyMakeBorder(infoNew, 25, 25, 100, 0, cv2.BORDER_CONSTANT)
+                    infoNew = cv2.resize(infoNew, (480-BORDER_LEFT-BORDER_RIGHT, 800-BORDER_TOP-BORDER_DOWN), interpolation= cv2.INTER_LINEAR)
+                    info = cv2.copyMakeBorder(infoNew, BORDER_TOP, BORDER_DOWN, BORDER_LEFT, BORDER_RIGHT, cv2.BORDER_CONSTANT)
                 x,y = liste[idx]
                 idx = (idx + 1)%len(liste)
                 x = float(x)
                 y = float(y)
                 coords = realCoordsToPixelCoords((x,y),realCoordWindow,pixelCoordWindow)
                 pro = cv2.circle(pro, coords, radius=6, color=(0, 0, 255), thickness=-1)
+                pro = cv2.warpPerspective(pro,M,(800, 800),flags=cv2.INTER_LINEAR)
             print(oldMode)
             img = np.concatenate((pro, info), axis=1)
             cv2.imshow("window", img)

@@ -6,7 +6,7 @@ def redraw():
     global imgDis
     imgDis = img.copy()
     for i in posList:
-        cv2.circle(imgDis,(i[0],i[1]),1,(0,255,0),-1)
+        cv2.circle(imgDis,(i[0],i[1]),2,(0,255,0),-1)
 
 posList = []
 def onMouse(event, x, y, flags, param):
@@ -32,7 +32,7 @@ cv2.setMouseCallback('window', onMouse)
 origPoints = [[743, 139], [84, 177], [67, 710], [722, 757]]
 
 for i in origPoints:
-    cv2.circle(img,(i[0],i[1]),1,(0,0,255),-1)
+    cv2.circle(img,(i[0],i[1]),2,(0,0,255),-1)
 imgDis = img.copy()
 
 while(1):
