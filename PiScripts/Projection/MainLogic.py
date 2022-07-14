@@ -133,7 +133,7 @@ def main():
                 y = float(y)
                 coords = realCoordsToPixelCoords((x,y),realCoordWindow,pixelCoordWindow)
                 pro = cv2.circle(pro, coords, radius=6, color=(0, 0, 255), thickness=-1)
-                pro = cv2.warpPerspective(pro,M,(800, 800),flags=cv2.INTER_LINEAR)
+            pro = cv2.warpPerspective(pro,M,(800, 800),flags=cv2.INTER_LINEAR)
             print(oldMode)
             infoDis = cv2.warpPerspective(info,Minfo,(480, 800),flags=cv2.INTER_LINEAR)
             img = np.concatenate((pro, infoDis), axis=1)
